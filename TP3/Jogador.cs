@@ -8,23 +8,24 @@ namespace TP3
 {
     public class Jogador
     {
-        public int numId { get; set; }
-        public int idade { get; set; }
-        public string nome { get; set; }
-        public bool convacado { get; set; }
-        public double golsPartida { get; set; }
-        public short numCamisa { get; set; }
-        public string dataEstreia {get; set; }
-        public Jogador(int numId, string nome, int idade, bool convacado, double golsPartida, short numCamisa, string dataEstreia)
-        {
-            this.numId = numId;
-            this.nome = nome;
-            this.idade = idade;
-            this.convacado = convacado;
-            this.golsPartida = golsPartida;
-            this.numCamisa = numCamisa;
-            this.dataEstreia = dataEstreia;
+        public DateTime DataDeNasc { get; set; }
+        public string Nome { get; set; }
+        public string UltSobrenome { get; set; }
+        public string Time { get; set; }
+        public bool Convacado { get; set; }
+        public double Gols { get; set; }
+        public ushort NumCamisa { get; set; }
+        public Guid Id { get; set; }
 
+        public int CalcularIdade()
+        {
+            DateTime dataAtual = DateTime.Now;
+            int idade = dataAtual.Year - DataDeNasc.Year;
+
+            if (DataDeNasc > dataAtual.AddYears(-idade))
+                idade--;
+
+            return idade;
         }
     }
 }

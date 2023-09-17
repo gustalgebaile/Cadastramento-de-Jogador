@@ -37,48 +37,81 @@
 
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Security.Cryptography.X509Certificates;
-using TP3;
-using static System.Net.Mime.MediaTypeNames;
-
+using System.Xml.Linq;
+using System.Globalization;
 
 
 class Program
 {
     public static void Main(string[] args)
     {
-        run();
-    }
-        static void run()
+        var repoJogador = new RepoJogador();
+
+        while (true)
         {
-            Console.WriteLine("Gerenciador de Jogador");
+            Console.WriteLine("Gerenciador de Jogador de Futebol");
             Console.WriteLine("Selecione uma das opções abaixo:");
-            Console.WriteLine("1 - Pesquisar Jogadores");
+            Console.WriteLine("1 - Pesquisar Jogador(es)");
             Console.WriteLine("2 - Adicionar novo Jogador");
             Console.WriteLine("3 - Sair");
-            ICadastrarJogador cadastrarJogador = new CadastroJogadorEmMemoria();
-            string Menu = Console.ReadLine();
-            do
+            int Menu = int.Parse(Console.ReadLine());
+            switch (Menu)
             {
-                if (Menu == "1")
-                {
+                case 1:
+                    Console.Write("Digite o nome para consulta: ");
+                    string procurarNome = Console.ReadLine();
+                    var resultadoProcura = repoJogador.ProcurarJogadorPorNome(procurarNome);
 
-                }
-                if (Menu == "2")
-                {
-                    Console.WriteLine("Quantos jogadores irão ser cadastrados?");
+                    if (resultadoProcura.Count > 0)
+                    {
+                        Console.WriteLine("Resultados da pesquisa:");
+                        for (int i = 0; i < resultadoProcura.Count; i++)
+                        {
+                            Console.WriteLine($"{i + 1}. Nome: {resultadoProcura[i].Nome}, Sobrenome: {resultadoProcura[i].UltSobrenome}, Time: {resultadoProcura[i].Time}");
+                        }
+
+                        Console.Write("Escolha o número do Jogador para ver detalhes: ");
+                        int choiceIndex = Convert.ToInt32(Console.ReadLine()) - 1;
+
+                        if (choiceIndex >= 0 && choiceIndex < resultadoProcura.Count)
+                        {
+                            var jogadorSelecionado = resultadoProcura[choiceIndex];
+                            Console.WriteLine($"Detalhes do Jogador: Nome: {jogadorSelecionado.Nome}, Sobrenome: {jogadorSelecionado.UltSobrenome}, Time: {jogadorSelecionado.Time}, Idade: {jogadorSelecionado.CalcularIdade()}, Convocado: {jogadorSelecionado.Convacado}, Gols na Temporada: {jogadorSelecionado.Gols}, Número da Camisa: {jogadorSelecionado.NumCamisa}");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Opção inválida.");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Nenhum Jogador encontrado com esse nome.");
+                    }
+
+                        break;
+                case 2:
+                    Console.WriteLine("Quantos jogador(es) serão ser cadastrado(s)?");
                     int numCadastros = int.Parse(Console.ReadLine());
                     for (int i = 0; i < numCadastros; i++)
                     {
-                        int numId = i;
                         Console.WriteLine("Qual o nome do jogador?");
                         string nome = Console.ReadLine();
-                        Console.WriteLine("Qual a idade?");
-                        int idade = int.Parse(Console.ReadLine());
-                        Console.WriteLine("Qual o jogador foi convocado? S/N");
+                        Console.WriteLine("Qual o último sobrenome do jogador?");
+                        string ultSobrenome = Console.ReadLine();
+                        Console.WriteLine("Qual o time do jogador?");
+                        string time = Console.ReadLine();
+                        Console.WriteLine("Qual a data de nascimento do jogador? yyyy-MM-dd");
+                        DateTime dataDeNasc = DateTime.Parse(Console.ReadLine());
+                        Console.WriteLine("O jogador foi convocado? S/N");
                         char booleano = char.Parse(Console.ReadLine());
                         bool convocado;
-                        if (booleano.Equals("S"))
+                        if (booleano == 'S')
+                        {
+                            convocado = true;
+                        }
+                        if (booleano == 's')
                         {
                             convocado = true;
                         }
@@ -86,18 +119,30 @@ class Program
                         {
                             convocado = false;
                         }
-                    Console.WriteLine("Qual a média de gols/partida do jogador?");
-                    double golsPartida = double.Parse(Console.ReadLine());
-                    Console.WriteLine("Qual o numéro da camisa do jogador?");
-                    short numCamisa = short.Parse(Console.ReadLine());
-                    Console.WriteLine("DIgite a data de estreia do jogador");
-                    string dataEstreia = Console.ReadLine();
-                    Jogador jogador = new Jogador(numId, nome, idade, convocado, golsPartida, numCamisa, dataEstreia);
-                    cadastrarJogador.AdicionarJogador(jogador);
-                        run();
+                        Console.WriteLine("Quantos gol(s) o jogador fez?");
+                        double gols = double.Parse(Console.ReadLine());
+                        Console.WriteLine("Qual o numéro da camisa do jogador?");
+                        ushort numCamisa = ushort.Parse(Console.ReadLine());
+                        var jogador = new Jogador
+                        {
+                            Nome = nome,
+                            UltSobrenome = ultSobrenome,
+                            Time = time,
+                            DataDeNasc = dataDeNasc,
+                            Convacado = convocado,
+                            Gols = gols,
+                            NumCamisa = numCamisa,
+                        };
+
+                        repoJogador.AdicionarJogador(jogador);
+                        Console.WriteLine("Jogador cadastrado com sucesso.");
                     }
-                }
-            } while (Menu != "3");
-        Console.WriteLine("Saindo...");
+                    break;
+                case 3:
+                    Console.WriteLine("Saindo...");
+                    Environment.Exit(0);
+                    break;
+            }
         }
     }
+}
