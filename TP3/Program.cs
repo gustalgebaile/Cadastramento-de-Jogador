@@ -41,9 +41,6 @@ using System.Numerics;
 using System.Security.Cryptography.X509Certificates;
 using System.Xml.Linq;
 using System.Globalization;
-using TP3;
-using static System.Net.Mime.MediaTypeNames;
-
 
 
 class Program
